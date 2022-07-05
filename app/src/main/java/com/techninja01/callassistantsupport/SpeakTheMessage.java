@@ -15,14 +15,16 @@ public class SpeakTheMessage extends AppCompatActivity implements TextToSpeech.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_speak_the_message);
-//        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-//            @Override
-//            public void onInit(int status) {
-//                if(status != TextToSpeech.ERROR){
-//                    textToSpeech.setLanguage(Locale.UK);
-//                }
-//            }
-//        });
+        tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR){
+                    tts.setLanguage(Locale.forLanguageTag("hin"));
+                    tts.setPitch(0.8f);
+                    tts.setSpeechRate(0.5f);
+                }
+            }
+        });
 //        Intent intent = getIntent();
 //        String msgBody = intent.getStringExtra("MESSAGE");
 //        textToSpeech.speak(msgBody,TextToSpeech.QUEUE_FLUSH, null);
