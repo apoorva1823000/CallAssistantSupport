@@ -3,11 +3,13 @@ package com.techninja01.callassistantsupport;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.telephony.SmsMessage;
 import android.widget.Toast;
 
+import java.util.Calendar;
 import java.util.Locale;
 
 public class ReceiveSms extends BroadcastReceiver implements TextToSpeech.OnInitListener, TextToSpeech.OnUtteranceCompletedListener {
@@ -16,6 +18,8 @@ public class ReceiveSms extends BroadcastReceiver implements TextToSpeech.OnInit
     TextToSpeech textToSpeech;
     private TextToSpeech tts = null;
     private String msg = "";
+    final String[] message1 = new String[1];
+    String message;
     @Override
     public void onReceive(Context context, Intent intent) {
         Toast.makeText(context, "Sms Received", Toast.LENGTH_SHORT).show();
@@ -33,6 +37,18 @@ public class ReceiveSms extends BroadcastReceiver implements TextToSpeech.OnInit
                     }
                 }
             });
+            Calendar c = Calendar.getInstance();
+            int timeOfDay = c.get(Calendar.HOUR_OF_DAY);
+            if(timeOfDay >= 0 && timeOfDay < 12){
+//                message = "Good Morning dear caller, the person you\'re calling is busy";
+                message = "Suprabhat, Aapne Apoorva Mehta ko call kiya hai aur ve abhi dusra application bna rhe hai";
+            }else if(timeOfDay >= 12 && timeOfDay < 16){
+                message = "Good Afternoon dear caller, the person you\'re calling is busy";
+            }else if(timeOfDay >= 16 && timeOfDay < 21){
+                message = "Good Evening dear caller, the person you\'re calling is busy";
+            }else if(timeOfDay >= 21 && timeOfDay < 24){
+                message = "Good Night dear caller, the person you\'re calling is sleeping";
+            }
             if(bundle!=null){
                 try{
                     Object[] pdus = (Object[]) bundle.get("pdus");
@@ -41,13 +57,17 @@ public class ReceiveSms extends BroadcastReceiver implements TextToSpeech.OnInit
                         smsMessages[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
                         msg_from = smsMessages[i].getOriginatingAddress();
                         msgBody = smsMessages[i].getMessageBody();
-                        msg = msgBody;
+                        if(msgBody.equalsIgnoreCase("0")){
+                            Toast.makeText(MainActivity.context,"M",Toast.LENGTH_SHORT).show();
+                            MainActivity.mediaPlayer = MediaPlayer.create(MainActivity.context,R.raw.msc1);
+                            MainActivity.mediaPlayer.start();
+                            msg = "Play Audio"+message;
+                        }else if (msgBody.equalsIgnoreCase("1")){
+                            MainActivity.mediaPlayer.pause();
+                            msg = "Call Over";
+                        }
+//                        msg = msgBody;
                         Toast.makeText(context, "From: "+msg_from+"\tContent: "+msgBody, Toast.LENGTH_SHORT).show();
-//                        Intent speechIntent = new Intent();
-//                        speechIntent.setClass(context, SpeakTheMessage.class);
-//                        speechIntent.putExtra("MESSAGE", msgBody);
-//                        speechIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |  Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-//                        context.startActivity(speechIntent);
                         tts = new TextToSpeech(MainActivity.context,this);
                     }
                 }catch (Exception e){
@@ -59,8 +79,6 @@ public class ReceiveSms extends BroadcastReceiver implements TextToSpeech.OnInit
     public void onInit(int status) {
         tts.speak(msg, TextToSpeech.QUEUE_FLUSH, null);
     }
-
-    // OnUtteranceCompletedListener impl
     public void onUtteranceCompleted(String utteranceId) {
         tts.shutdown();
         tts = null;

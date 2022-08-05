@@ -8,6 +8,7 @@ import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -24,6 +25,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     public static Context context;
+    public static MediaPlayer mediaPlayer;
     SwitchCompat service;
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -33,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
 
         context = this;
         service = findViewById(R.id.serviceSwitch);
-
 
         Dexter.withContext(MainActivity.this).withPermissions(Manifest.permission.READ_SMS,Manifest.permission.RECEIVE_SMS,Manifest.permission.FOREGROUND_SERVICE).withListener(new MultiplePermissionsListener() {
             @Override
